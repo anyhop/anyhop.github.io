@@ -3,311 +3,163 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>anyhop — run every VPN connection at once</title>
-<meta name="description" content="anyhop keeps several VPN exits live at the same time and sends each connection out the one a rule picks — by domain, by IP range, or everything else by default. CLI, web UI, and REST API.">
+<title>anyhop — several VPN exits at once</title>
+<meta name="description" content="anyhop keeps several VPN exits live and routes each connection by rule — domain, IP range, or a default you choose. CLI, web UI, REST API.">
 <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
 <link rel="canonical" href="https://anyhop.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="anyhop">
-<meta property="og:description" content="A universal VPN client that runs several VPN connections at once, with rule-based routing.">
+<meta property="og:description" content="Several VPN exits at once. Rule-based routing.">
 <meta property="og:url" content="https://anyhop.github.io/">
 <meta property="og:image" content="https://anyhop.github.io/assets/icon.svg">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#e7edf1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e1416" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f5">
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
 
-<header class="masthead">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
   <a class="brand" href="/" aria-label="anyhop home">
-    <img class="brand-icon" src="assets/icon.svg" alt="" width="26" height="26">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="assets/wordmark-dark.svg">
-      <img class="brand-word" src="assets/wordmark.svg" alt="anyhop" height="20">
-    </picture>
+    <img class="word" src="assets/wordmark.svg" alt="anyhop" height="22">
   </a>
-  <nav class="masthead-nav" aria-label="Project">
+  <nav aria-label="Primary">
     <a href="https://anyhop.github.io/anyhop/">Docs</a>
     <a href="https://github.com/anyhop/anyhop">GitHub</a>
-    <a href="https://pypi.org/project/anyhop/">PyPI</a>
   </nav>
 </header>
 
-<main>
+<main id="main">
 
-  <!-- ── hero ───────────────────────────────────────────────────────────── -->
-  <section class="hero" aria-labelledby="hero-title">
-    <img class="hero-mark" src="assets/icon.svg" alt="" width="46" height="46">
-    <h1 id="hero-title">Run every VPN connection at once.</h1>
+  <section class="hero">
+    <h1>Several VPN exits.<br>One set of rules.</h1>
     <p class="lede">
-      anyhop keeps several VPN exits live at the same time — one provider or mixed
-      across providers — and sends each connection out the one a rule picks: by
-      domain, by IP range, or everything else by default.
+      Keep locations live at the same time — one provider or mixed —
+      and send each connection out the exit a rule picks.
     </p>
 
-    <div class="install">
-      <p class="eyebrow">Install</p>
+    <div class="install" role="group" aria-label="Install">
       <div class="cmd">
         <code id="install-cmd">curl -LsSf https://github.com/anyhop/anyhop/releases/latest/download/install.sh | sh</code>
-        <button class="copy" type="button" data-copy-target="install-cmd">Copy</button>
+        <button type="button" class="copy" data-copy="install-cmd" aria-label="Copy install command">Copy</button>
       </div>
-      <p class="install-note">macOS and Linux — installs anyhop and its user-level login service.</p>
-      <ul class="alts">
-        <li><code>brew install anyhop/tap/anyhop</code><span>Homebrew</span></li>
-        <li><code>pip install anyhop</code><span>pip</span></li>
-        <li><code>docker pull ghcr.io/anyhop/anyhop:latest</code><span>Docker</span></li>
-      </ul>
-      <p class="install-more">
-        Every method, plus the checksum-verified manual install and the uninstaller,
-        is in <a href="https://anyhop.github.io/anyhop/getting-started/">Getting started</a>.
+      <p class="hint">
+        macOS &amp; Linux ·
+        <a href="https://anyhop.github.io/anyhop/getting-started/">brew, pip, Docker, and more</a>
       </p>
     </div>
   </section>
 
-  <!-- ── the router entrypoint (signature) ──────────────────────────────── -->
-  <section class="rig" id="rig" aria-labelledby="rig-title">
-    <div class="rig-head">
+  <section class="demo" id="demo" aria-labelledby="demo-title">
+    <div class="demo-head">
       <div>
-        <p class="eyebrow">The router entrypoint</p>
-        <h2 id="rig-title">One entrypoint. Ordered rules. Your exits.</h2>
-        <p class="rig-sub">
-          Every connection enters the same local proxy. Rulesets are checked in order
-          and the first match wins, so the order of the blocks is the priority.
-        </p>
+        <p class="eyebrow">How it routes</p>
+        <h2 id="demo-title">First match wins.</h2>
       </div>
-
       <div class="trace">
-        <label class="eyebrow" for="trace-input">Trace a destination</label>
-        <div class="trace-field">
-          <input id="trace-input" type="text" inputmode="url" autocomplete="off"
+        <label class="eyebrow" for="q">Try a destination</label>
+        <div class="trace-row">
+          <input id="q" type="text" inputmode="url" autocomplete="off"
                  spellcheck="false" placeholder="example.com">
         </div>
-        <div class="trace-chips">
-          <button type="button" data-trace="netflix.com">netflix.com</button>
-          <button type="button" data-trace="192.168.1.5">192.168.1.5</button>
-          <button type="button" data-trace="tracker.example.com">tracker.example.com</button>
-          <button type="button" data-trace="github.com">github.com</button>
+        <div class="chips" role="group" aria-label="Examples">
+          <button type="button" data-q="netflix.com">netflix.com</button>
+          <button type="button" data-q="192.168.1.5">192.168.1.5</button>
+          <button type="button" data-q="tracker.example.com">tracker…</button>
+          <button type="button" data-q="github.com">github.com</button>
         </div>
-        <p class="trace-result" id="trace-result" role="status" aria-live="polite">
-          <span class="trace-idle">Pick one above, or type a destination.</span>
-        </p>
+        <p class="result" id="result" role="status" aria-live="polite"></p>
       </div>
     </div>
 
-    <div class="rig-grid">
-      <div class="rig-src">
-        <p class="eyebrow">What points here</p>
-        <ul>
-          <li>a browser<i class="stub" aria-hidden="true"></i></li>
-          <li>a terminal<i class="stub" aria-hidden="true"></i></li>
-          <li>a container<i class="stub" aria-hidden="true"></i></li>
-          <li>a script<i class="stub" aria-hidden="true"></i></li>
-          <li>the whole machine <span class="badge">TUN</span><i class="stub" aria-hidden="true"></i></li>
-        </ul>
-      </div>
+    <ol class="rules" id="rules">
+      <li class="rule" data-kind="block" data-domain="tracker.example.com">
+        <span class="n">0</span>
+        <span class="body">
+          <span class="name">BlockTrackers</span>
+          <code>domain tracker.example.com</code>
+        </span>
+        <span class="via" data-tone="down">
+          <span class="dot" aria-hidden="true"></span>
+          block
+        </span>
+      </li>
+      <li class="rule" data-kind="direct" data-cidr="192.168.0.0/16">
+        <span class="n">1</span>
+        <span class="body">
+          <span class="name">LocalDirect</span>
+          <code>cidr 192.168.0.0/16</code>
+        </span>
+        <span class="via" data-tone="faint">
+          <span class="dot" aria-hidden="true"></span>
+          direct
+        </span>
+      </li>
+      <li class="rule" data-kind="vpn" data-domain="netflix.com hulu.com">
+        <span class="n">2</span>
+        <span class="body">
+          <span class="name">Streaming</span>
+          <code>domain netflix.com</code>
+        </span>
+        <span class="via" data-tone="live">
+          <span class="dot" aria-hidden="true"></span>
+          nordvpn/us
+        </span>
+      </li>
+      <li class="rule" data-kind="vpn" data-all="true">
+        <span class="n">3</span>
+        <span class="body">
+          <span class="name">DefaultVPN</span>
+          <code>all</code>
+        </span>
+        <span class="via" data-tone="live">
+          <span class="dot" aria-hidden="true"></span>
+          nordvpn/jp
+        </span>
+      </li>
+    </ol>
 
-      <div class="rig-inwire" aria-hidden="true">
-        <span class="wire"></span>
-      </div>
-
-      <ol class="rig-rules">
-        <li class="rule" data-kind="block" data-domain="tracker.example.com">
-          <span class="rule-head">
-            <span class="pri">0</span>
-            <span class="rule-name">BlockTrackers</span>
-          </span>
-          <span class="rule-match"><code>domain tracker.example.com</code></span>
-          <span class="rule-link" aria-hidden="true"><span class="wire"></span></span>
-          <span class="exit">
-            <span class="dot" aria-hidden="true"></span>
-            <span class="exit-body">
-              <span class="exit-name">block</span>
-              <span class="exit-port">connection dropped</span>
-            </span>
-          </span>
-        </li>
-
-        <li class="rule" data-kind="direct" data-cidr="192.168.0.0/16">
-          <span class="rule-head">
-            <span class="pri">1</span>
-            <span class="rule-name">LocalDirect</span>
-          </span>
-          <span class="rule-match"><code>cidr 192.168.0.0/16</code></span>
-          <span class="rule-link" aria-hidden="true"><span class="wire"></span></span>
-          <span class="exit">
-            <span class="dot" aria-hidden="true"></span>
-            <span class="exit-body">
-              <span class="exit-name">direct</span>
-              <span class="exit-port">no VPN</span>
-            </span>
-          </span>
-        </li>
-
-        <li class="rule" data-kind="vpn" data-domain="netflix.com hulu.com">
-          <span class="rule-head">
-            <span class="pri">2</span>
-            <span class="rule-name">Streaming</span>
-          </span>
-          <span class="rule-match"><code>domain netflix.com</code> <code>domain hulu.com</code></span>
-          <span class="rule-link" aria-hidden="true"><span class="wire"></span></span>
-          <span class="exit">
-            <span class="dot" aria-hidden="true"></span>
-            <span class="exit-body">
-              <span class="exit-name">nordvpn/wg_us_1</span>
-              <span class="exit-port">127.0.0.1:1081</span>
-            </span>
-          </span>
-        </li>
-
-        <li class="rule" data-kind="vpn" data-all="true">
-          <span class="rule-head">
-            <span class="pri">3</span>
-            <span class="rule-name">DefaultVPN</span>
-          </span>
-          <span class="rule-match"><code>all</code></span>
-          <span class="rule-link" aria-hidden="true"><span class="wire"></span></span>
-          <span class="exit">
-            <span class="dot" aria-hidden="true"></span>
-            <span class="exit-body">
-              <span class="exit-name">nordvpn/wg_jp_1</span>
-              <span class="exit-port">127.0.0.1:1082</span>
-            </span>
-          </span>
-        </li>
-      </ol>
-    </div>
-
-    <p class="rig-foot">
-      Rulesets are authored and reordered from the CLI:
-      <code>anyhop routes ruleset create Streaming --via nordvpn/wg_us_1 --domain netflix.com</code>.
-      Traffic that matches nothing goes direct by default, or nowhere with the
-      kill-switch on. See
-      <a href="https://anyhop.github.io/anyhop/routing/">Rule-based routing</a>.
+    <p class="demo-foot">
+      CLI, web UI, or REST — same rules.
+      <a href="https://anyhop.github.io/anyhop/routing/">Rule-based routing →</a>
     </p>
   </section>
 
-  <!-- ── who it is for ──────────────────────────────────────────────────── -->
-  <section class="split" aria-label="Who anyhop is for">
-    <article class="split-col">
-      <p class="eyebrow">For people</p>
-      <h2>Several locations, at the same time.</h2>
-      <p>
-        Your VPN's own app connects to one location at a time. Switching countries
-        means disconnecting first, and breaking whatever was using the old exit.
-      </p>
-      <p>
-        anyhop keeps several locations live at once. Point each site or address
-        range at the exit you want, and leave everything else on a default you
-        choose — no switching, no reconnecting.
-      </p>
-      <p>
-        There is a bundled web UI (<code>anyhop ui</code>) for channels, routes and
-        logs, and a full CLI if you would rather stay in the terminal.
-      </p>
+  <section class="points" aria-label="What you get">
+    <article>
+      <h2>Many exits, still on</h2>
+      <p>Your VPN app holds one location. anyhop holds several. No disconnect to switch countries.</p>
     </article>
-
-    <article class="split-col">
-      <p class="eyebrow">For programs</p>
-      <h2>Every action is also a REST call.</h2>
-      <p>
-        Each channel is a stable <code>127.0.0.1:&lt;port&gt;</code> proxy, and
-        everything the CLI does is also available over <code>/api/v1</code> with
-        Bearer auth. Another program can create, probe, rotate and retire VPN
-        connections on its own schedule.
-      </p>
-      <p>
-        That is what makes proxy rotation across regions — and reaching geofenced
-        resources from wherever they are served — something you can script rather
-        than click through.
-      </p>
-      <p>
-        The container image is <code>ghcr.io/anyhop/anyhop</code>, so a compose
-        stack can add anyhop as one service and let sibling containers reach the
-        internet through whichever exit the rules pick.
-      </p>
+    <article>
+      <h2>Rules, not clicks</h2>
+      <p>Domain, CIDR, geosite, geoip, or a catch-all. Order is priority. Unmatched goes direct.</p>
+    </article>
+    <article>
+      <h2>People and programs</h2>
+      <p>CLI and a bundled web UI for you. Stable local proxies and <code>/api/v1</code> for everything else.</p>
     </article>
   </section>
 
-  <!-- ── facts ──────────────────────────────────────────────────────────── -->
-  <section class="facts" aria-label="Support">
-    <div class="fact">
-      <p class="eyebrow">VPN providers</p>
-      <ul>
-        <li><strong>NordVPN</strong> — token or API setup, location selection, automatic WireGuard channel creation</li>
-        <li><strong>Proton VPN</strong> — WireGuard <code>.conf</code> import</li>
-      </ul>
-      <p class="fact-foot">
-        Which providers can come next, and why some cannot, is in the
-        <a href="https://anyhop.github.io/anyhop/vpn-provider-research/">provider research</a>.
-      </p>
-    </div>
-
-    <div class="fact">
-      <p class="eyebrow">Platforms</p>
-      <ul>
-        <li><strong>macOS</strong>, <strong>Linux</strong> — supported</li>
-        <li><strong>Docker</strong> — supported</li>
-        <li><strong>Windows</strong> — planned</li>
-      </ul>
-      <p class="fact-foot">
-        How it runs underneath — one <code>sing-box</code> process, state, ports and
-        probes — is in <a href="https://anyhop.github.io/anyhop/how-it-works/">How it works</a>.
-      </p>
-    </div>
-
-    <div class="fact">
-      <p class="eyebrow">Interfaces</p>
-      <ul>
-        <li><strong>CLI</strong> — the primary surface, including whole-machine TUN mode</li>
-        <li><strong>Web UI</strong> — dashboard, bundle, logs</li>
-        <li><strong>REST API</strong> — <code>/api/v1</code></li>
-      </ul>
-      <p class="fact-foot">
-        Deliberately headless: there is no menu-bar or tray app — and a
-        <a href="https://anyhop.github.io/anyhop/for-agents/">page written for coding agents</a>.
-      </p>
-    </div>
-  </section>
-
-  <section class="elsewhere" aria-label="Repositories">
-    <p class="eyebrow">Repositories</p>
-    <ul>
-      <li>
-        <a href="https://github.com/anyhop/anyhop"><strong>anyhop/anyhop</strong></a>
-        <span>The client — CLI, daemon, control API, web UI, container image</span>
-      </li>
-      <li>
-        <a href="https://github.com/anyhop/homebrew-tap"><strong>anyhop/homebrew-tap</strong></a>
-        <span><code>brew install anyhop/tap/anyhop</code></span>
-      </li>
-    </ul>
-    <p class="compare">
-      Coming from another tool?
-      <a href="https://anyhop.github.io/anyhop/gluetun-comparison/">anyhop and gluetun</a> ·
-      <a href="https://anyhop.github.io/anyhop/vopono-comparison/">anyhop and vopono</a>
-    </p>
+  <section class="bar" aria-label="Support at a glance">
+    <p><strong>Providers</strong> NordVPN · Proton VPN</p>
+    <p><strong>Platforms</strong> macOS · Linux · Docker</p>
+    <p><strong>Ship</strong> PyPI · Homebrew · GHCR</p>
   </section>
 
 </main>
 
-<footer class="footer">
-  <div>
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="assets/wordmark-dark.svg">
-      <img src="assets/wordmark.svg" alt="anyhop" height="18">
-    </picture>
-  </div>
+<footer class="foot">
+  <img src="assets/wordmark.svg" alt="anyhop" height="16">
   <nav aria-label="Footer">
-    <a href="https://anyhop.github.io/anyhop/">Documentation</a>
+    <a href="https://anyhop.github.io/anyhop/">Docs</a>
     <a href="https://github.com/anyhop/anyhop">Source</a>
     <a href="https://pypi.org/project/anyhop/">PyPI</a>
     <a href="https://github.com/anyhop/anyhop/pkgs/container/anyhop">Container</a>
   </nav>
-  <p class="legal">MIT licensed · © 2026 anyhop contributors</p>
+  <p class="legal">MIT · © 2026 anyhop</p>
 </footer>
 
-<noscript><style>.trace{display:none}</style></noscript>
 <script src="assets/site.js" defer></script>
 </body>
 </html>

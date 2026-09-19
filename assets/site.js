@@ -1,156 +1,142 @@
-/* Progressive enhancement for the landing page: the copy button on the install
-   command, and the trace control on the router schematic. The schematic itself
-   is plain HTML and CSS — everything the page claims is readable without this
-   file; only the interaction needs it. */
-
+/* Copy + first-match trace. Page is readable without this file. */
 (function () {
   "use strict";
 
-  /* ---- copy the install command ---- */
-
-  Array.prototype.forEach.call(document.querySelectorAll(".copy"), function (btn) {
+  document.querySelectorAll(".copy").forEach(function (btn) {
     btn.addEventListener("click", function () {
-      var source = document.getElementById(btn.dataset.copyTarget);
-      if (!source) return;
+      var el = document.getElementById(btn.getAttribute("data-copy"));
+      if (!el) return;
       var label = btn.textContent;
+      var text = el.textContent.trim();
 
-      function flash() {
+      function done() {
         btn.textContent = "Copied";
         btn.dataset.done = "1";
         setTimeout(function () {
           btn.textContent = label;
           delete btn.dataset.done;
-        }, 1600);
+        }, 1400);
       }
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(source.textContent.trim()).then(flash, function () {});
+        navigator.clipboard.writeText(text).then(done).catch(function () {});
         return;
       }
-      // the async clipboard API needs a secure context; fall back to a selection
       var range = document.createRange();
-      range.selectNodeContents(source);
-      var selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-      try { document.execCommand("copy"); flash(); } catch (err) { /* nothing to do */ }
-      selection.removeAllRanges();
+      range.selectNodeContents(el);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      try { document.execCommand("copy"); done(); } catch (e) {}
+      sel.removeAllRanges();
     });
   });
 
-  /* ---- trace a destination through the rule table ---- */
+  var input = document.getElementById("q");
+  var result = document.getElementById("result");
+  var list = document.getElementById("rules");
+  if (!input || !result || !list) return;
 
-  var input = document.getElementById("trace-input");
-  var rig = document.getElementById("rig");
-  var result = document.getElementById("trace-result");
-  if (!input || !rig || !result) return;
-
-  var rules = Array.prototype.map.call(rig.querySelectorAll(".rule"), function (el) {
+  var rules = Array.prototype.map.call(list.querySelectorAll(".rule"), function (el) {
     return {
       el: el,
-      name: el.querySelector(".rule-name").textContent.trim(),
-      exit: el.querySelector(".exit-name").textContent.trim(),
+      name: el.querySelector(".name").textContent.trim(),
+      exit: el.querySelector(".via").textContent.replace(/\s+/g, " ").trim().replace(/^·?\s*/, ""),
       domains: (el.dataset.domain || "").split(/\s+/).filter(Boolean),
       cidrs: (el.dataset.cidr || "").split(/\s+/).filter(Boolean),
       all: el.dataset.all === "true"
     };
   });
+  // exit text includes the dot character area; clean via textContent of name only
+  rules.forEach(function (r) {
+    var via = r.el.querySelector(".via");
+    r.exit = via.childNodes[via.childNodes.length - 1].textContent.trim();
+  });
 
-  function escapeHtml(value) {
-    return value.replace(/[&<>"']/g, function (ch) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+  function esc(s) {
+    return s.replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
 
-  function ipToInt(value) {
-    var parts = value.split(".");
-    if (parts.length !== 4) return null;
+  function ipInt(v) {
+    var p = v.split(".");
+    if (p.length !== 4) return null;
     var n = 0;
     for (var i = 0; i < 4; i++) {
-      if (!/^\d{1,3}$/.test(parts[i])) return null;
-      var octet = Number(parts[i]);
-      if (octet > 255) return null;
-      n = n * 256 + octet;
+      if (!/^\d{1,3}$/.test(p[i])) return null;
+      var o = Number(p[i]);
+      if (o > 255) return null;
+      n = n * 256 + o;
     }
     return n;
   }
 
   function inCidr(ip, cidr) {
-    var halves = cidr.split("/");
-    var net = ipToInt(halves[0]);
-    var addr = ipToInt(ip);
+    var h = cidr.split("/");
+    var net = ipInt(h[0]), addr = ipInt(ip);
     if (net === null || addr === null) return false;
-    var bits = halves.length === 2 ? Number(halves[1]) : 32;
+    var bits = h.length === 2 ? Number(h[1]) : 32;
     if (!(bits >= 0 && bits <= 32)) return false;
     var mask = bits === 0 ? 0 : (0xffffffff << (32 - bits)) >>> 0;
     return ((addr & mask) >>> 0) === ((net & mask) >>> 0);
   }
 
-  // Mirrors the CLI: --cidr matches IP-literal destinations only, and --domain
-  // matches a domain plus everything under it, on a dot boundary.
-  function matches(rule, query) {
+  function matches(rule, q) {
     if (rule.all) return true;
-    if (ipToInt(query) !== null) {
-      return rule.cidrs.some(function (cidr) { return inCidr(query, cidr); });
+    if (ipInt(q) !== null) {
+      return rule.cidrs.some(function (c) { return inCidr(q, c); });
     }
-    var lower = query.toLowerCase();
-    return rule.domains.some(function (domain) {
-      domain = domain.toLowerCase();
-      return lower === domain || lower.endsWith("." + domain);
+    var lower = q.toLowerCase();
+    return rule.domains.some(function (d) {
+      d = d.toLowerCase();
+      return lower === d || lower.endsWith("." + d);
     });
   }
 
-  function render(rawQuery) {
-    var query = rawQuery.trim();
+  function render(raw) {
+    var q = raw.trim();
+    document.querySelectorAll(".chips button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.q === q));
+    });
 
-    Array.prototype.forEach.call(
-      document.querySelectorAll(".trace-chips button"),
-      function (chip) {
-        chip.setAttribute("aria-pressed", String(chip.dataset.trace === query));
-      }
-    );
-
-    if (!query) {
-      rules.forEach(function (rule) { rule.el.className = "rule"; });
-      result.innerHTML = '<span class="trace-idle">Pick one above, or type a destination.</span>';
+    if (!q) {
+      rules.forEach(function (r) { r.el.className = "rule"; });
+      result.textContent = "";
       return;
     }
 
-    var winner = -1;
+    var win = -1;
     for (var i = 0; i < rules.length; i++) {
-      if (matches(rules[i], query)) { winner = i; break; }
+      if (matches(rules[i], q)) { win = i; break; }
     }
 
-    rules.forEach(function (rule, i) {
-      rule.el.className = "rule " + (i === winner ? "win" : i < winner ? "skip" : "idle");
+    rules.forEach(function (r, i) {
+      r.el.className = "rule " + (i === win ? "win" : i < win ? "skip" : "idle");
     });
 
-    var shown = "<strong>" + escapeHtml(query) + "</strong>";
-
-    if (winner < 0) {
-      result.innerHTML = shown + " <span class=\"miss\">matched no ruleset.</span>";
+    if (win < 0) {
+      result.innerHTML = "<strong>" + esc(q) + "</strong> matched nothing.";
       return;
     }
 
     result.innerHTML =
-      shown + " → <strong>" + escapeHtml(rules[winner].exit) + "</strong>" +
-      '<span class="trace-note"><span class="hit">' + escapeHtml(rules[winner].name) +
-      "</span> · priority " + winner + "</span>";
+      "<strong>" + esc(q) + "</strong> → <strong>" + esc(rules[win].exit) + "</strong>" +
+      '<span class="note"><span class="hit">' + esc(rules[win].name) +
+      "</span> · priority " + win + "</span>";
   }
 
-  var debounce;
+  var t;
   input.addEventListener("input", function () {
-    clearTimeout(debounce);
-    debounce = setTimeout(function () { render(input.value); }, 60);
+    clearTimeout(t);
+    t = setTimeout(function () { render(input.value); }, 50);
   });
 
-  Array.prototype.forEach.call(
-    document.querySelectorAll(".trace-chips button"),
-    function (chip) {
-      chip.addEventListener("click", function () {
-        input.value = chip.dataset.trace;
-        render(chip.dataset.trace);
-      });
-    }
-  );
+  document.querySelectorAll(".chips button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      input.value = b.dataset.q;
+      render(b.dataset.q);
+      input.focus();
+    });
+  });
 })();

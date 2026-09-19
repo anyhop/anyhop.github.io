@@ -1,0 +1,775 @@
+/* anyhop — landing page.
+   The palette and the semantic colour roles are the app's own
+   (src/anyhop/assets/style.css in anyhop/anyhop): blue is the tool acting,
+   teal is a live tunnel, grey is no tunnel, red is dropped traffic. Nothing
+   here is decorative colour.
+   Type: Archivo for display, the platform system stack for body copy (the app
+   deliberately uses one voice, the platform font), IBM Plex Mono for machine
+   values — the same reservation the app makes. All three are self-hosted. */
+
+@font-face {
+  font-family: Archivo;
+  src: url(fonts/archivo-var-latin.woff2) format("woff2");
+  font-weight: 400 800;
+  font-stretch: 62% 125%;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url(fonts/plexmono-400-latin.woff2) format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url(fonts/plexmono-500-latin.woff2) format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  src: url(fonts/plexmono-600-latin.woff2) format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+
+  --ground: #e7edf1;
+  --panel: #fbfcfb;
+  --panel-2: #eef3f2;
+  --line: #ced9d8;
+  --line-2: #94a6a4;
+
+  --text: #17201f;
+  --muted: #536462;
+  --faint: #81908e;
+
+  --brand: #3b82f6;
+  --live: #007f73;
+  --route: #6655df;
+  --down: #bd332b;
+
+  --shadow-soft: 0 1px 2px rgba(23, 32, 31, .05);
+  --shadow-pop: 0 12px 32px -12px rgba(23, 32, 31, .22);
+
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto,
+    system-ui, "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --display: Archivo, var(--sans);
+
+  --radius: 10px;
+  --gut: 24px;
+  --wide: 1080px;
+  --wire: 56px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --ground: #0e1416;
+    --panel: #1c2426;
+    --panel-2: #232c2e;
+    --line: #323c3e;
+    --line-2: #4c5a5c;
+
+    --text: #e7edf1;
+    --muted: #9fb0ad;
+    --faint: #7a8c89;
+
+    --brand: #0a84ff;
+    --live: #2bbd9e;
+    --route: #9a86ff;
+    --down: #e5665c;
+
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, .28);
+    --shadow-pop: 0 12px 32px -12px rgba(0, 0, 0, .6);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+}
+
+h1, h2, h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-stretch: 92%;
+  letter-spacing: -.028em;
+  line-height: 1.06;
+  text-wrap: balance;
+  margin: 0;
+}
+
+p { margin: 0; }
+
+a {
+  color: var(--text);
+  text-decoration-color: var(--line-2);
+  text-underline-offset: 3px;
+}
+a:hover { text-decoration-color: currentColor; }
+
+code {
+  font-family: var(--mono);
+  font-size: .88em;
+  letter-spacing: -.01em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---- masthead ---- */
+
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px max(var(--gut), calc((100% - var(--wide)) / 2));
+  background: color-mix(in srgb, var(--ground) 84%, transparent);
+  backdrop-filter: saturate(1.6) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+}
+.brand-icon { width: 26px; height: 26px; display: block; }
+.brand-word { height: 20px; width: auto; display: block; }
+
+.masthead-nav {
+  display: flex;
+  gap: 22px;
+  font-size: 14px;
+}
+.masthead-nav a {
+  text-decoration: none;
+  color: var(--muted);
+}
+.masthead-nav a:hover { color: var(--text); }
+
+/* ---- layout ---- */
+
+main > section {
+  max-width: var(--wide);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+.hero { padding-block: 68px 0; }
+
+/* ---- hero ---- */
+
+.hero-mark {
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 26px;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 6.2vw, 4.25rem);
+  max-width: 15ch;
+}
+
+.lede {
+  margin-top: 22px;
+  max-width: 62ch;
+  font-size: clamp(1.04rem, 1.5vw, 1.2rem);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.install {
+  margin-top: 44px;
+  max-width: 720px;
+  padding: 20px 22px 18px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+.cmd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 11px 12px 11px 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.cmd code {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+}
+
+.copy {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 6px 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.copy:hover { color: var(--text); border-color: var(--line-2); }
+.copy[data-done] { color: var(--live); border-color: var(--live); }
+
+.install-note {
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.alts {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 7px;
+}
+.alts li {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-size: 13px;
+}
+.alts code {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+}
+.alts span { flex: none; color: var(--muted); font-size: 12px; }
+
+.install-more {
+  margin-top: 16px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+/* ---- the router entrypoint ---- */
+
+.rig {
+  margin-top: 64px;
+  padding: 28px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+}
+
+.rig-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  gap: 32px;
+  align-items: start;
+  padding-bottom: 26px;
+  border-bottom: 1px solid var(--line);
+}
+
+.rig-head h2 {
+  margin-top: 10px;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+}
+.rig-sub {
+  margin-top: 12px;
+  max-width: 52ch;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+
+/* trace control */
+
+.trace-field {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.trace-field:focus-within { border-color: var(--brand); }
+.trace-field input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  padding: 10px 0;
+  background: none;
+  border: 0;
+  outline: 0;
+}
+.trace-field input::placeholder { color: var(--faint); }
+
+.trace-chips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+.trace-chips button {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+  padding: 4px 9px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.trace-chips button:hover { color: var(--text); border-color: var(--line-2); }
+.trace-chips button[aria-pressed="true"] {
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 8%, var(--panel-2));
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--line));
+}
+
+.trace-result {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  min-height: 3.1em;
+}
+.trace-result strong { color: var(--text); font-weight: 600; }
+.trace-result .hit { color: var(--route); font-weight: 600; }
+.trace-result .miss { color: var(--muted); }
+.trace-note { display: block; margin-top: 3px; }
+.trace-idle { color: var(--muted); }
+
+/* the schematic */
+
+.rig-grid {
+  display: grid;
+  grid-template-columns: minmax(150px, 200px) var(--wire) minmax(0, 1fr);
+  align-items: stretch;
+  margin-top: 26px;
+}
+.rig-src { align-self: center; }
+
+/* the sources converge on one rail at the column's right edge, which is where
+   the entry wire leaves for the rule table. The rail is measured from the
+   list box, so it meets the first and last stub exactly: each row is 20px
+   tall, so its centre sits 10px in from either end. */
+.rig-src ul {
+  position: relative;
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.rig-src ul::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 1.5px;
+  background: var(--line-2);
+}
+.rig-src li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 20px;
+}
+.stub {
+  flex: 1;
+  height: 1.5px;
+  min-width: 12px;
+  background: var(--line-2);
+}
+
+.badge {
+  font-size: 9.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: .1em;
+  padding: 1px 5px;
+  color: var(--muted);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+}
+
+.rig-inwire { position: relative; height: 100%; min-height: 40px; }
+
+/* The rule table reads as one instrument panel rather than a stack of cards:
+   hairline-separated rows on a single surface, each row wired to its exit. */
+.rig-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.rule {
+  display: grid;
+  /* the content column is fixed rather than max-content so every row's wire
+     starts at the same x and the connectors read as parallel */
+  grid-template-columns: 300px minmax(24px, 1fr) 168px;
+  grid-template-rows: auto auto;
+  align-items: center;
+  align-content: center;
+  padding: 11px 16px;
+  transition: opacity .25s ease, background-color .25s ease;
+}
+.rule + .rule { border-top: 1px solid var(--line); }
+
+/* exit state colours — the app's own roles */
+.rule[data-kind="vpn"]    { --tone: var(--live); }
+.rule[data-kind="direct"] { --tone: var(--faint); }
+.rule[data-kind="block"]  { --tone: var(--down); }
+
+.rule-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  grid-area: 1 / 1;
+}
+.pri {
+  flex: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  padding: 2px 6px;
+  color: var(--panel);
+  background: var(--brand);
+  border-radius: 4px;
+}
+.rule-name {
+  font-family: var(--display);
+  font-weight: 600;
+  font-stretch: 95%;
+  letter-spacing: -.01em;
+  font-size: 15px;
+}
+
+.rule-match {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+  grid-area: 2 / 1;
+}
+.rule-match code {
+  font-size: 11.5px;
+  color: var(--muted);
+  padding: 2px 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+.rule-link { grid-area: 1 / 2 / 3 / 3; }
+.exit      { grid-area: 1 / 3 / 3 / 4; }
+
+/* the wire: a rail plus a travelling packet */
+.wire {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 1.5px;
+  background: var(--line-2);
+}
+.rig-inwire .wire { position: absolute; top: 50%; left: 0; }
+
+.wire::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 50%;
+  background: currentColor;
+  color: var(--line-2);
+  animation: run 3.2s linear infinite;
+}
+.rule .wire { color: var(--tone); }
+.rule .wire::after { opacity: .85; }
+
+@keyframes run {
+  0%   { left: -4px; opacity: 0; }
+  14%  { opacity: 1; }
+  86%  { opacity: 1; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.rule:nth-child(2) .wire::after { animation-delay: -1.1s; }
+.rule:nth-child(3) .wire::after { animation-delay: -2.2s; }
+.rule:nth-child(4) .wire::after { animation-delay: -1.7s; }
+
+/* exit cell */
+
+.exit {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tone);
+}
+.exit-body { display: grid; min-width: 0; }
+/* the exit carries its state colour — the same meaning the app gives it:
+   teal is a live tunnel, grey is no tunnel, red is dropped traffic. Pulled
+   toward the text colour so it stays legible on both surfaces. */
+.exit-name {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--tone) 84%, var(--text));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.exit-port {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* trace states */
+
+/* Rows the trace passed over lose their colour as well as their opacity, so
+   the matching row is the only saturated thing in the table. */
+.rule.skip { opacity: .5; filter: saturate(.35); }
+.rule.idle { opacity: .3; filter: saturate(.25); }
+
+.rule.win {
+  background: color-mix(in srgb, var(--route) 9%, transparent);
+  box-shadow: inset 3px 0 0 var(--route);
+}
+.rule.win .pri { background: var(--route); }
+.rule.win .wire { background: color-mix(in srgb, var(--tone) 40%, var(--line)); }
+.rule.win .dot {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone) 22%, transparent);
+}
+.rule.skip .wire::after,
+.rule.idle .wire::after { animation-play-state: paused; opacity: 0; }
+
+.rig-foot {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--muted);
+}
+.rig-foot code {
+  font-size: 12px;
+  color: var(--text);
+  padding: 1px 5px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+
+/* ---- who it is for ---- */
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 40px;
+  margin-top: 80px;
+}
+.split-col h2 {
+  margin-top: 10px;
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  max-width: 20ch;
+}
+.split-col p {
+  margin-top: 14px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.split-col code {
+  font-size: 12.5px;
+  color: var(--text);
+}
+
+/* ---- facts ---- */
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px;
+  margin-top: 72px;
+  padding-block: 40px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.facts .eyebrow { color: var(--text); }
+.fact ul {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+.fact strong { color: var(--text); font-weight: 600; }
+.fact code { font-size: 12px; color: var(--text); }
+.fact-foot {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---- repositories ---- */
+
+.elsewhere { margin-top: 64px; }
+.elsewhere ul {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.elsewhere li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 16px;
+  font-size: 14.5px;
+}
+.elsewhere li span { color: var(--muted); font-size: 13.5px; }
+.elsewhere li code { font-size: 12.5px; }
+.compare { margin-top: 18px; font-size: 13.5px; color: var(--muted); }
+
+/* ---- footer ---- */
+
+.footer {
+  max-width: var(--wide);
+  margin: 72px auto 0;
+  padding: 26px var(--gut) 44px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 26px;
+}
+.footer img { height: 18px; width: auto; display: block; opacity: .75; }
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 13.5px;
+  margin-inline-start: auto;
+}
+.footer nav a { text-decoration: none; color: var(--muted); }
+.footer nav a:hover { color: var(--text); }
+.legal { font-size: 12.5px; color: var(--muted); flex-basis: 100%; }
+
+/* ---- responsive ---- */
+
+@media (max-width: 900px) {
+  .rig-head { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .facts { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+}
+
+@media (max-width: 820px) {
+  .split { grid-template-columns: minmax(0, 1fr); gap: 34px; }
+
+  .rig { padding: 20px; }
+  .rig-grid { grid-template-columns: minmax(0, 1fr); }
+  .rig-inwire { display: none; }
+  .rig-src { margin-bottom: 20px; }
+  .rig-src ul::after { display: none; }
+  .stub { display: none; }
+  .rig-src ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+
+  /* each rule becomes a card: name, matchers, then the exit it leaves by */
+  .rule {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+  .rule-link { display: none; }
+  .rule-head { grid-area: auto; }
+  .rule-match { grid-area: auto; }
+  .exit {
+    grid-area: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .wire::after { animation: none; left: 50%; opacity: .9; }
+}

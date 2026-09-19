@@ -1,6 +1,63 @@
-/* Copy + first-match trace. Page is readable without this file. */
+/* Copy, first-match trace, and appearance toggle.
+   Theme class is set before paint by the head script; this only wires the button. */
 (function () {
   "use strict";
+
+  var KEY = "anyhop-theme";
+  var root = document.documentElement;
+  var mq = window.matchMedia("(prefers-color-scheme: dark)");
+  var MOON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.2 9.5A5.2 5.2 0 1 1 6.5 2.8 4.2 4.2 0 0 0 13.2 9.5z"/></svg>';
+  var SUN = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="2.9"/><path d="M8 1.6v1.4M8 13v1.4M14.4 8H13M3 8H1.6M12.4 3.6l-1 1M4.6 11.4l-1 1M12.4 12.4l-1-1M4.6 4.6l-1-1"/></svg>';
+
+  function saved() {
+    try { return localStorage.getItem(KEY); }
+    catch (e) { return null; }
+  }
+
+  function apply(t) {
+    root.classList.toggle("dark", t === "dark");
+    var meta = document.getElementById("theme-color");
+    if (meta) meta.setAttribute("content", t === "dark" ? "#0e1416" : "#f4f6f5");
+  }
+
+  function setTheme(t) {
+    try { localStorage.setItem(KEY, t); }
+    catch (e) {}
+    apply(t);
+  }
+
+  function resolved() {
+    var s = saved();
+    if (s === "light" || s === "dark") return s;
+    return mq.matches ? "dark" : "light";
+  }
+
+  // Follow OS while the user has not pinned a choice.
+  mq.addEventListener("change", function () {
+    if (!saved()) apply(mq.matches ? "dark" : "light");
+    paintToggle();
+  });
+
+  var toggle = document.getElementById("theme-toggle");
+  function paintToggle() {
+    if (!toggle) return;
+    var dark = root.classList.contains("dark");
+    toggle.innerHTML = dark ? SUN : MOON;
+    toggle.setAttribute("aria-label", dark ? "Switch to light appearance" : "Switch to dark appearance");
+    toggle.setAttribute("aria-pressed", String(dark));
+    toggle.title = dark ? "Light appearance" : "Dark appearance";
+  }
+  if (toggle) {
+    toggle.addEventListener("click", function () {
+      setTheme(root.classList.contains("dark") ? "light" : "dark");
+      paintToggle();
+    });
+    paintToggle();
+  }
+  // Keep meta theme-color in sync with whatever the head script chose.
+  apply(resolved());
+
+  /* ---- copy ---- */
 
   document.querySelectorAll(".copy").forEach(function (btn) {
     btn.addEventListener("click", function () {
@@ -32,6 +89,8 @@
     });
   });
 
+  /* ---- first-match trace ---- */
+
   var input = document.getElementById("q");
   var result = document.getElementById("result");
   var list = document.getElementById("rules");
@@ -41,13 +100,12 @@
     return {
       el: el,
       name: el.querySelector(".name").textContent.trim(),
-      exit: el.querySelector(".via").textContent.replace(/\s+/g, " ").trim().replace(/^·?\s*/, ""),
+      exit: "",
       domains: (el.dataset.domain || "").split(/\s+/).filter(Boolean),
       cidrs: (el.dataset.cidr || "").split(/\s+/).filter(Boolean),
       all: el.dataset.all === "true"
     };
   });
-  // exit text includes the dot character area; clean via textContent of name only
   rules.forEach(function (r) {
     var via = r.el.querySelector(".via");
     r.exit = via.childNodes[via.childNodes.length - 1].textContent.trim();

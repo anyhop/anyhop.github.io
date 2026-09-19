@@ -13,7 +13,18 @@
 <meta property="og:url" content="https://anyhop.github.io/">
 <meta property="og:image" content="https://anyhop.github.io/assets/icon.svg">
 <meta name="twitter:card" content="summary">
-<meta name="theme-color" content="#f4f6f5">
+<meta name="theme-color" content="#f4f6f5" id="theme-color">
+<script>
+/* Before first paint — same contract as the app: explicit anyhop-theme wins,
+   otherwise follow prefers-color-scheme. Sets html.dark; no flash. */
+(function () {
+  try {
+    var s = localStorage.getItem("anyhop-theme");
+    var dark = s ? s === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.classList.toggle("dark", dark);
+  } catch (e) {}
+})();
+</script>
 <link rel="stylesheet" href="assets/site.css">
 </head>
 <body>
@@ -22,12 +33,18 @@
 
 <header class="top">
   <a class="brand" href="/" aria-label="anyhop home">
-    <img class="word" src="assets/wordmark.svg" alt="anyhop" height="22">
+    <img class="word word-light" src="assets/wordmark.svg" alt="anyhop" height="22">
+    <img class="word word-dark" src="assets/wordmark-dark.svg" alt="" height="22" aria-hidden="true">
   </a>
-  <nav aria-label="Primary">
-    <a href="https://anyhop.github.io/anyhop/">Docs</a>
-    <a href="https://github.com/anyhop/anyhop">GitHub</a>
-  </nav>
+  <div class="top-end">
+    <nav aria-label="Primary">
+      <a href="https://anyhop.github.io/anyhop/">Docs</a>
+      <a href="https://github.com/anyhop/anyhop">GitHub</a>
+    </nav>
+    <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch appearance">
+      <!-- filled by site.js -->
+    </button>
+  </div>
 </header>
 
 <main id="main">
@@ -150,7 +167,10 @@
 </main>
 
 <footer class="foot">
-  <img src="assets/wordmark.svg" alt="anyhop" height="16">
+  <span class="foot-mark" aria-label="anyhop">
+    <img class="word-light" src="assets/wordmark.svg" alt="anyhop" height="16">
+    <img class="word-dark" src="assets/wordmark-dark.svg" alt="" height="16" aria-hidden="true">
+  </span>
   <nav aria-label="Footer">
     <a href="https://anyhop.github.io/anyhop/">Docs</a>
     <a href="https://github.com/anyhop/anyhop">Source</a>

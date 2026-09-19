@@ -225,10 +225,15 @@ code {
   opacity: .75;
 }
 
-/* Wordmarks: light SVG on light, dark SVG on dark. */
-.word-dark { display: none; }
-html.dark .word-light { display: none; }
-html.dark .word-dark { display: block; }
+/* Wordmarks: light SVG on light, dark SVG on dark. The compound selectors
+   must outrank the .brand .word / .foot-mark img display rules above, or
+   both wordmarks render in light appearance. */
+.brand .word-dark,
+.foot-mark .word-dark { display: none; }
+html.dark .brand .word-light,
+html.dark .foot-mark .word-light { display: none; }
+html.dark .brand .word-dark,
+html.dark .foot-mark .word-dark { display: block; }
 
 .top-end {
   display: flex;

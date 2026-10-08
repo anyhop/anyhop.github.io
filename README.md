@@ -11,6 +11,9 @@ Static files — no build:
 | Path | |
 | ---- | - |
 | `index.html` | Page |
+| `robots.txt` | Crawler rules for the host, including the docs sitemap |
+| `sitemap.xml` | The landing page |
+| `assets/og.png` | Social card (source: `assets/og.svg`) |
 | `assets/site.css` | Light-only styles; tokens at the top |
 | `assets/site.js` | Copy button + rule-trace demo |
 | `assets/fonts/` | Self-hosted Archivo + IBM Plex Mono (OFL) |
